@@ -35,8 +35,10 @@ RUN mkdir -p $CAFFE_ROOT && \
     cd $CAFFE_ROOT && \
     git clone https://github.com/s9xie/hed . && \
     git checkout 9e74dd710773d8d8a469ad905c76f4a7fa08f945 && \
+    # python -m pip uninstall pip && \
+    # apt install --reinstall python-pip && \
     pip install --upgrade pip && \
-    cd python && for req in $(cat requirements.txt) pydot; do pip install $req; done && cd .. && \
+    cd python && for req in $(cat requirements.txt) pydot; do python -m pip install $req; done && cd .. && \
     # https://github.com/s9xie/hed/pull/23
     sed -i "s|add_subdirectory(examples)||g" CMakeLists.txt && \
     # https://github.com/s9xie/hed/issues/11
@@ -54,7 +56,10 @@ RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 RUN cd $CAFFE_ROOT && curl -O http://vcl.ucsd.edu/hed/hed_pretrained_bsds.caffemodel
 
 # octave
-RUN apt-get install -y --no-install-recommends octave liboctave-dev && \
+RUN apt-get install -y --no-install-recommends software-properties-common && \
+    add-apt-repository ppa:octave/stable && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends octave liboctave-dev && \
     octave --eval "pkg install -forge image" && \
     echo "pkg load image;" >> /root/.octaverc
 
